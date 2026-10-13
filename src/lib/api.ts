@@ -31,9 +31,12 @@ async function request<T>(
         error?: string;
         errors?: Array<string | { message?: string }>;
       };
-      if (data.message) message = data.message;
-      else if (data.error) message = data.error;
-      else if (Array.isArray(data.errors) && data.errors.length > 0) {
+      // Backend error shape: `{ success: false, error }`
+      if (typeof data.error === "string" && data.error.trim()) {
+        message = data.error;
+      } else if (data.message) {
+        message = data.message;
+      } else if (Array.isArray(data.errors) && data.errors.length > 0) {
         const first = data.errors[0];
         message = typeof first === "string" ? first : first.message ?? message;
       }

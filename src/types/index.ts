@@ -9,8 +9,9 @@ export interface User {
   role: UserRole;
 }
 
+/** Matches backend milestone shape: `{ views, payout }` */
 export interface Milestone {
-  viewThreshold: number;
+  views: number;
   payout: number;
 }
 
