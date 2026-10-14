@@ -38,8 +38,8 @@ export default function AuthGate({
 
   if (isLoading) {
     return (
-      <main className="mx-auto flex min-h-full items-center justify-center px-4 py-16">
-        <p className="text-sm text-zinc-600">Loading…</p>
+      <main className="flex min-h-dvh items-center justify-center px-4">
+        <p className="muted text-sm">Loading…</p>
       </main>
     );
   }

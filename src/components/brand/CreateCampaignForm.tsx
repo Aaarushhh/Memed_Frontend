@@ -2,12 +2,9 @@
 
 import { FormEvent, useState } from "react";
 import { getErrorMessage } from "@/lib/api";
-import { PLATFORMS } from "@/lib/constants";
+import { DEFAULT_PLATFORM, PLATFORMS } from "@/lib/constants";
 import { createCampaign } from "@/lib/services/campaigns";
 import type { Campaign, Milestone, Platform } from "@/types";
-
-const field =
-  "rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500";
 
 interface Props {
   onCreated: (campaign: Campaign) => void;
@@ -15,7 +12,7 @@ interface Props {
 
 export default function CreateCampaignForm({ onCreated }: Props) {
   const [name, setName] = useState("");
-  const [platform, setPlatform] = useState<Platform>("Instagram");
+  const [platform, setPlatform] = useState<Platform>(DEFAULT_PLATFORM);
   const [totalBudget, setTotalBudget] = useState("");
   const [milestones, setMilestones] = useState<Milestone[]>([
     { views: 0, payout: 0 },
@@ -56,7 +53,7 @@ export default function CreateCampaignForm({ onCreated }: Props) {
       onCreated(campaign);
       setName("");
       setTotalBudget("");
-      setPlatform("Instagram");
+      setPlatform(DEFAULT_PLATFORM);
       setMilestones([{ views: 0, payout: 0 }]);
     } catch (err) {
       setError(getErrorMessage(err, "Failed to create campaign"));
@@ -66,14 +63,14 @@ export default function CreateCampaignForm({ onCreated }: Props) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4 rounded-lg border border-zinc-200 p-4"
-    >
-      <h2 className="text-lg font-medium">Create campaign</h2>
+    <form onSubmit={handleSubmit} className="panel flex flex-col gap-4">
+      <div>
+        <h2 className="font-display text-xl font-bold tracking-tight">Create campaign</h2>
+        <p className="muted mt-1 text-sm">Set budget and a milestone ladder.</p>
+      </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="campaign-name" className="text-sm font-medium">
+      <div>
+        <label htmlFor="campaign-name" className="label">
           Name
         </label>
         <input
@@ -81,20 +78,20 @@ export default function CreateCampaignForm({ onCreated }: Props) {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className={field}
+          className="field"
         />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="platform" className="text-sm font-medium">
+        <div>
+          <label htmlFor="platform" className="label">
             Platform
           </label>
           <select
             id="platform"
             value={platform}
             onChange={(e) => setPlatform(e.target.value as Platform)}
-            className={field}
+            className="field"
           >
             {PLATFORMS.map((item) => (
               <option key={item} value={item}>
@@ -104,8 +101,8 @@ export default function CreateCampaignForm({ onCreated }: Props) {
           </select>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="budget" className="text-sm font-medium">
+        <div>
+          <label htmlFor="budget" className="label">
             Total budget (₹)
           </label>
           <input
@@ -115,22 +112,22 @@ export default function CreateCampaignForm({ onCreated }: Props) {
             required
             value={totalBudget}
             onChange={(e) => setTotalBudget(e.target.value)}
-            className={field}
+            className="field"
           />
         </div>
       </div>
 
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">Milestones</h3>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-sm font-semibold">Milestones</h3>
           <button
             type="button"
             onClick={() =>
               setMilestones((prev) => [...prev, { views: 0, payout: 0 }])
             }
-            className="text-sm underline"
+            className="text-sm font-semibold underline"
           >
-            Add
+            Add row
           </button>
         </div>
 
@@ -142,7 +139,7 @@ export default function CreateCampaignForm({ onCreated }: Props) {
               placeholder="Views"
               value={milestone.views || ""}
               onChange={(e) => updateMilestone(index, "views", e.target.value)}
-              className={field}
+              className="field"
             />
             <input
               type="number"
@@ -150,7 +147,7 @@ export default function CreateCampaignForm({ onCreated }: Props) {
               placeholder="Payout ₹"
               value={milestone.payout || ""}
               onChange={(e) => updateMilestone(index, "payout", e.target.value)}
-              className={field}
+              className="field"
             />
             <button
               type="button"
@@ -159,7 +156,8 @@ export default function CreateCampaignForm({ onCreated }: Props) {
                   prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)
                 )
               }
-              className="rounded-md border border-zinc-300 px-3 text-sm"
+              className="btn btn-ghost px-3"
+              aria-label={`Remove milestone ${index + 1}`}
             >
               ×
             </button>
@@ -168,16 +166,12 @@ export default function CreateCampaignForm({ onCreated }: Props) {
       </div>
 
       {error ? (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+        <p className="alert alert-error" role="alert">
           {error}
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-      >
+      <button type="submit" disabled={submitting} className="btn btn-primary">
         {submitting ? "Creating…" : "Create campaign"}
       </button>
     </form>

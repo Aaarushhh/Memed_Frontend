@@ -67,15 +67,17 @@ function CreatorDashboard() {
     campaigns.find((campaign) => campaign.id === selectedId) ?? null;
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-10">
+    <main className="page rise">
       <PageHeader
-        title="Creator dashboard"
-        subtitle="Browse live campaigns, submit posts, and track earnings."
+        title="Creator desk"
+        subtitle="Browse live campaigns, submit posts, and track your earnings."
       />
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
         <section>
-          <h2 className="mb-3 text-lg font-medium">Live campaigns</h2>
+          <h2 className="font-display mb-3 text-xl font-bold tracking-tight">
+            Live campaigns
+          </h2>
           <CampaignBrowser
             campaigns={campaigns}
             loading={campaignsLoading}
@@ -86,12 +88,12 @@ function CreatorDashboard() {
         </section>
 
         <div className="flex flex-col gap-6">
-          <SubmitPostForm campaign={selected} />
           <EarningsSummary
             totalEarnings={totalEarnings}
             loading={earningsLoading}
             error={earningsError}
           />
+          <SubmitPostForm campaign={selected} />
         </div>
       </div>
     </main>

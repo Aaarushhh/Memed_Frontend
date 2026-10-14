@@ -9,23 +9,29 @@ interface Props {
 }
 
 export default function EarningsSummary({ totalEarnings, loading, error }: Props) {
-  if (loading) return <p className="text-sm text-zinc-600">Loading earnings…</p>;
+  if (loading) return <p className="muted text-sm">Loading earnings…</p>;
   if (error) {
     return (
-      <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+      <p className="alert alert-error" role="alert">
         {error}
       </p>
     );
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 p-4">
-      <h2 className="text-lg font-medium">Your earnings</h2>
-      <p className="mt-2 text-3xl font-semibold tracking-tight">
+    <div className="panel relative overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[var(--accent)] opacity-70"
+      />
+      <h2 className="font-display relative text-xl font-bold tracking-tight">
+        Your earnings
+      </h2>
+      <p className="font-display relative mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
         {formatInr(totalEarnings ?? 0)}
       </p>
-      <p className="mt-1 text-sm text-zinc-600">
-        Updates after view milestones are crossed on the backend.
+      <p className="muted relative mt-2 text-sm">
+        Grows when your posts cross campaign milestones.
       </p>
     </div>
   );

@@ -18,16 +18,20 @@ export default function CampaignBrowser({
   selectedId,
   onSelect,
 }: Props) {
-  if (loading) return <p className="text-sm text-zinc-600">Loading campaigns…</p>;
+  if (loading) return <p className="muted text-sm">Loading campaigns…</p>;
   if (error) {
     return (
-      <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+      <p className="alert alert-error" role="alert">
         {error}
       </p>
     );
   }
   if (campaigns.length === 0) {
-    return <p className="text-sm text-zinc-600">No live campaigns.</p>;
+    return (
+      <div className="panel">
+        <p className="muted text-sm">No live campaigns right now.</p>
+      </div>
+    );
   }
 
   return (
@@ -39,29 +43,45 @@ export default function CampaignBrowser({
             <button
               type="button"
               onClick={() => onSelect(campaign.id)}
-              className={`w-full rounded-lg border p-4 text-left ${
+              className={`panel w-full text-left transition-[border-color,background,transform] ${
                 selected
-                  ? "border-zinc-900 bg-zinc-50"
-                  : "border-zinc-200 hover:border-zinc-400"
+                  ? "panel-selected"
+                  : "hover:-translate-y-0.5 hover:border-[var(--ink)]"
               }`}
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <h3 className="font-medium">{campaign.name}</h3>
-                  <p className="text-sm text-zinc-600">{campaign.platform}</p>
+                  <h3 className="font-display text-lg font-bold tracking-tight">
+                    {campaign.name}
+                  </h3>
+                  <p className="muted mt-0.5 text-sm">{campaign.platform}</p>
                 </div>
-                <p className="text-sm text-zinc-600">
-                  Remaining {formatInr(campaign.budgetRemaining)}
+                <p className="text-sm font-semibold">
+                  {formatInr(campaign.budgetRemaining)}
+                  <span className="muted ml-1 font-normal">left</span>
                 </p>
               </div>
+
               {campaign.milestones.length > 0 ? (
-                <ul className="mt-2 space-y-0.5 text-sm text-zinc-700">
+                <ul className="mt-3 space-y-1 border-t border-[var(--line)] pt-3 text-sm">
                   {campaign.milestones.map((m) => (
-                    <li key={`${campaign.id}-${m.views}-${m.payout}`}>
-                      {m.views.toLocaleString("en-IN")} views → {formatInr(m.payout)}
+                    <li
+                      key={`${campaign.id}-${m.views}-${m.payout}`}
+                      className="flex justify-between gap-3"
+                    >
+                      <span className="muted">
+                        {m.views.toLocaleString("en-IN")} views
+                      </span>
+                      <span className="font-medium">{formatInr(m.payout)}</span>
                     </li>
                   ))}
                 </ul>
+              ) : null}
+
+              {selected ? (
+                <p className="mt-3 text-xs font-semibold uppercase tracking-wide">
+                  Selected for submission
+                </p>
               ) : null}
             </button>
           </li>

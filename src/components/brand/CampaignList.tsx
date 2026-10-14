@@ -10,21 +10,25 @@ interface Props {
 }
 
 export default function CampaignList({ campaigns, loading, error }: Props) {
-  if (loading) return <p className="text-sm text-zinc-600">Loading campaigns…</p>;
+  if (loading) return <p className="muted text-sm">Loading campaigns…</p>;
   if (error) {
     return (
-      <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+      <p className="alert alert-error" role="alert">
         {error}
       </p>
     );
   }
   if (campaigns.length === 0) {
-    return <p className="text-sm text-zinc-600">No campaigns yet.</p>;
+    return (
+      <div className="panel">
+        <p className="muted text-sm">No campaigns yet. Create one to get started.</p>
+      </div>
+    );
   }
 
   return (
     <ul className="flex flex-col gap-3">
-      {campaigns.map((campaign) => {
+      {campaigns.map((campaign, index) => {
         const spentPct =
           campaign.totalBudget > 0
             ? Math.min(
@@ -34,36 +38,52 @@ export default function CampaignList({ campaigns, loading, error }: Props) {
             : 0;
 
         return (
-          <li key={campaign.id} className="rounded-lg border border-zinc-200 p-4">
+          <li
+            key={campaign.id}
+            className={`panel rise ${index === 0 ? "" : ""}`}
+            style={{ animationDelay: `${index * 60}ms` }}
+          >
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
-                <h3 className="font-medium">{campaign.name}</h3>
-                <p className="text-sm text-zinc-600">{campaign.platform}</p>
+                <h3 className="font-display text-lg font-bold tracking-tight">
+                  {campaign.name}
+                </h3>
+                <p className="muted mt-0.5 text-sm">{campaign.platform}</p>
               </div>
-              <p className="text-sm text-zinc-600">
+              <p className="rounded-lg bg-[var(--accent)] px-2.5 py-1 text-sm font-semibold">
                 {formatInr(campaign.totalBudget)}
               </p>
             </div>
 
-            <div className="mt-3 grid gap-1 text-sm sm:grid-cols-2">
+            <div className="mt-4 grid gap-1 text-sm sm:grid-cols-2">
               <p>
-                Spent: <span className="font-medium">{formatInr(campaign.budgetSpent)}</span>
+                Spent{" "}
+                <span className="font-semibold">{formatInr(campaign.budgetSpent)}</span>
               </p>
               <p>
-                Remaining:{" "}
-                <span className="font-medium">{formatInr(campaign.budgetRemaining)}</span>
+                Remaining{" "}
+                <span className="font-semibold">
+                  {formatInr(campaign.budgetRemaining)}
+                </span>
               </p>
             </div>
 
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-100">
-              <div className="h-full bg-zinc-900" style={{ width: `${spentPct}%` }} />
+            <div className="progress mt-3">
+              <span style={{ width: `${spentPct}%` }} />
             </div>
+            <p className="muted mt-1.5 text-xs">{spentPct}% of budget used</p>
 
             {campaign.milestones.length > 0 ? (
-              <ul className="mt-3 space-y-0.5 text-sm text-zinc-700">
+              <ul className="mt-3 space-y-1 border-t border-[var(--line)] pt-3 text-sm">
                 {campaign.milestones.map((m) => (
-                  <li key={`${campaign.id}-${m.views}-${m.payout}`}>
-                    {m.views.toLocaleString("en-IN")} views → {formatInr(m.payout)}
+                  <li
+                    key={`${campaign.id}-${m.views}-${m.payout}`}
+                    className="flex justify-between gap-3"
+                  >
+                    <span className="muted">
+                      {m.views.toLocaleString("en-IN")} views
+                    </span>
+                    <span className="font-medium">{formatInr(m.payout)}</span>
                   </li>
                 ))}
               </ul>

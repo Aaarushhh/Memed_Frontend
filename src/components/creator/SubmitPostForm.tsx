@@ -5,9 +5,6 @@ import { getErrorMessage } from "@/lib/api";
 import { submitPost } from "@/lib/services/submissions";
 import type { Campaign } from "@/types";
 
-const field =
-  "rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500";
-
 interface Props {
   campaign: Campaign | null;
 }
@@ -44,20 +41,18 @@ export default function SubmitPostForm({ campaign }: Props) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4 rounded-lg border border-zinc-200 p-4"
-    >
-      <h2 className="text-lg font-medium">Submit a post</h2>
+    <form onSubmit={handleSubmit} className="panel flex flex-col gap-4">
+      <div>
+        <h2 className="font-display text-xl font-bold tracking-tight">Submit a post</h2>
+        <p className="muted mt-1 text-sm">
+          {campaign
+            ? `${campaign.name} · ${campaign.platform}`
+            : "Pick a live campaign first"}
+        </p>
+      </div>
 
-      <p className="text-sm text-zinc-600">
-        {campaign
-          ? `Selected: ${campaign.name} (${campaign.platform})`
-          : "Select a live campaign first"}
-      </p>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="post-url" className="text-sm font-medium">
+      <div>
+        <label htmlFor="post-url" className="label">
           Post link
         </label>
         <input
@@ -67,26 +62,22 @@ export default function SubmitPostForm({ campaign }: Props) {
           placeholder="https://..."
           value={postUrl}
           onChange={(e) => setPostUrl(e.target.value)}
-          className={field}
+          className="field"
         />
       </div>
 
       {error ? (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+        <p className="alert alert-error" role="alert">
           {error}
         </p>
       ) : null}
 
-      {success ? (
-        <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
-          {success}
-        </p>
-      ) : null}
+      {success ? <p className="alert alert-success">{success}</p> : null}
 
       <button
         type="submit"
         disabled={submitting || !campaign}
-        className="rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+        className="btn btn-primary"
       >
         {submitting ? "Submitting…" : "Submit post"}
       </button>

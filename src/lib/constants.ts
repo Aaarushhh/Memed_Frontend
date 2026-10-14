@@ -4,7 +4,13 @@ export const API_BASE_URL =
 export const TOKEN_KEY = "memed_token";
 export const USER_KEY = "memed_user";
 
-export const PLATFORMS = ["Instagram", "YouTube"] as const;
+import type { Platform, UserRole } from "@/types";
+
+export const ROLES: readonly UserRole[] = ["brand", "creator"];
+export const PLATFORMS: readonly Platform[] = ["Instagram", "YouTube"];
+
+export const DEFAULT_ROLE: UserRole = "creator";
+export const DEFAULT_PLATFORM: Platform = "Instagram";
 
 export const ROUTES = {
   home: "/",
@@ -29,6 +35,6 @@ export const ENDPOINTS = {
   },
 } as const;
 
-export function dashboardRoute(role: "brand" | "creator") {
+export function dashboardRoute(role: UserRole) {
   return role === "brand" ? ROUTES.brand : ROUTES.creator;
 }

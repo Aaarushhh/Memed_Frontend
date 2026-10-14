@@ -4,18 +4,15 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getErrorMessage } from "@/lib/api";
-import { ROUTES } from "@/lib/constants";
+import { DEFAULT_ROLE, ROLES, ROUTES } from "@/lib/constants";
 import type { UserRole } from "@/types";
-
-const field =
-  "rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500";
 
 export default function SignupForm() {
   const { signup } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("creator");
+  const [role, setRole] = useState<UserRole>(DEFAULT_ROLE);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -38,9 +35,9 @@ export default function SignupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="name" className="text-sm font-medium">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div>
+        <label htmlFor="name" className="label">
           Name
         </label>
         <input
@@ -50,12 +47,12 @@ export default function SignupForm() {
           autoComplete="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className={field}
+          className="field"
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm font-medium">
+      <div>
+        <label htmlFor="email" className="label">
           Email
         </label>
         <input
@@ -65,12 +62,12 @@ export default function SignupForm() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className={field}
+          className="field"
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm font-medium">
+      <div>
+        <label htmlFor="password" className="label">
           Password
         </label>
         <input
@@ -81,43 +78,52 @@ export default function SignupForm() {
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className={field}
+          className="field"
         />
       </div>
 
-      <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium">Role</legend>
-        {(["brand", "creator"] as const).map((value) => (
-          <label key={value} className="flex items-center gap-2 text-sm capitalize">
-            <input
-              type="radio"
-              name="role"
-              value={value}
-              checked={role === value}
-              onChange={() => setRole(value)}
-            />
-            {value}
-          </label>
-        ))}
+      <fieldset>
+        <legend className="label mb-2">I am a</legend>
+        <div className="grid grid-cols-2 gap-2">
+          {ROLES.map((value) => {
+            const active = role === value;
+            return (
+              <label
+                key={value}
+                className={`cursor-pointer rounded-xl border px-3 py-3 text-center text-sm font-semibold capitalize transition-colors ${
+                  active
+                    ? "border-[var(--ink)] bg-[var(--accent)]"
+                    : "border-[var(--line)] bg-white hover:border-[var(--ink)]"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value={value}
+                  checked={active}
+                  onChange={() => setRole(value)}
+                  className="sr-only"
+                />
+                {value}
+              </label>
+            );
+          })}
+        </div>
       </fieldset>
 
       {error ? (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+        <p className="alert alert-error" role="alert">
           {error}
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-      >
+      <button type="submit" disabled={submitting} className="btn btn-primary w-full">
         {submitting ? "Creating account…" : "Sign up"}
       </button>
 
-      <p className="text-center text-sm text-zinc-600">
+      <p className="muted text-center text-sm">
         Already have an account?{" "}
-        <Link href={ROUTES.login} className="font-medium underline">
+        <Link href={ROUTES.login} className="font-semibold text-[var(--ink)] underline">
           Login
         </Link>
       </p>

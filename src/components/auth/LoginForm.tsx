@@ -6,9 +6,6 @@ import { useAuth } from "@/context/AuthContext";
 import { getErrorMessage } from "@/lib/api";
 import { ROUTES } from "@/lib/constants";
 
-const field =
-  "rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500";
-
 export default function LoginForm() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
@@ -30,9 +27,9 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm font-medium">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div>
+        <label htmlFor="email" className="label">
           Email
         </label>
         <input
@@ -42,12 +39,12 @@ export default function LoginForm() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className={field}
+          className="field"
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm font-medium">
+      <div>
+        <label htmlFor="password" className="label">
           Password
         </label>
         <input
@@ -58,27 +55,23 @@ export default function LoginForm() {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className={field}
+          className="field"
         />
       </div>
 
       {error ? (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+        <p className="alert alert-error" role="alert">
           {error}
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-      >
+      <button type="submit" disabled={submitting} className="btn btn-primary w-full">
         {submitting ? "Logging in…" : "Login"}
       </button>
 
-      <p className="text-center text-sm text-zinc-600">
+      <p className="muted text-center text-sm">
         No account?{" "}
-        <Link href={ROUTES.signup} className="font-medium underline">
+        <Link href={ROUTES.signup} className="font-semibold text-[var(--ink)] underline">
           Sign up
         </Link>
       </p>

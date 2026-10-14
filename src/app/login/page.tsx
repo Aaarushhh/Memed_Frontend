@@ -6,17 +6,17 @@ import { ROUTES } from "@/lib/constants";
 export default function LoginPage() {
   return (
     <AuthGate mode="guest">
-      <main className="mx-auto flex min-h-full w-full max-w-md flex-col justify-center px-4 py-12">
-        <div className="mb-6">
-          <Link href={ROUTES.home} className="text-sm text-zinc-500 hover:text-zinc-800">
-            ← Meme&apos;d
+      <main className="atmos flex min-h-dvh items-center justify-center px-4 py-12">
+        <div className="panel-strong rise w-full max-w-md p-6 sm:p-8">
+          <Link href={ROUTES.home} className="brand-mark text-xl">
+            Meme&apos;d
           </Link>
-          <h1 className="mt-3 text-2xl font-semibold tracking-tight">Login</h1>
-          <p className="mt-1 text-sm text-zinc-600">
-            Sign in to manage campaigns or track earnings.
-          </p>
+          <h1 className="font-display mt-5 text-3xl font-bold tracking-tight">Welcome back</h1>
+          <p className="muted mt-2 text-sm">Sign in to your brand or creator account.</p>
+          <div className="mt-6">
+            <LoginForm />
+          </div>
         </div>
-        <LoginForm />
       </main>
     </AuthGate>
   );

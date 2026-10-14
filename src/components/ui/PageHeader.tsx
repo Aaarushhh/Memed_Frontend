@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { ROUTES } from "@/lib/constants";
 
 export default function PageHeader({
   title,
@@ -12,25 +14,26 @@ export default function PageHeader({
   const { user, logout } = useAuth();
 
   return (
-    <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {subtitle ? <p className="mt-1 text-sm text-zinc-600">{subtitle}</p> : null}
+    <header className="mb-8">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <Link href={ROUTES.home} className="brand-mark text-2xl tracking-tight">
+          Meme&apos;d
+        </Link>
         {user ? (
-          <p className="mt-1 text-xs text-zinc-500">
-            {user.name} · {user.role}
-          </p>
+          <div className="flex items-center gap-3">
+            <span className="muted hidden text-sm sm:inline">
+              {user.name}
+              <span className="mx-1.5 opacity-40">·</span>
+              <span className="capitalize">{user.role}</span>
+            </span>
+            <button type="button" onClick={logout} className="btn btn-ghost py-2 text-sm">
+              Logout
+            </button>
+          </div>
         ) : null}
       </div>
-      {user ? (
-        <button
-          type="button"
-          onClick={logout}
-          className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm"
-        >
-          Logout
-        </button>
-      ) : null}
+      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+      {subtitle ? <p className="muted mt-2 max-w-2xl text-base">{subtitle}</p> : null}
     </header>
   );
 }

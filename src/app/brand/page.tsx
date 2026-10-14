@@ -34,20 +34,25 @@ function BrandDashboard() {
   }, []);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-10">
+    <main className="page rise">
       <PageHeader
-        title="Brand dashboard"
-        subtitle="Create campaigns and track budget spent vs remaining."
+        title="Brand desk"
+        subtitle="Launch campaigns and watch budget spent versus remaining."
       />
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
         <CreateCampaignForm
           onCreated={(campaign) =>
-            setCampaigns((prev) => [campaign, ...prev.filter((c) => c.id !== campaign.id)])
+            setCampaigns((prev) => [
+              campaign,
+              ...prev.filter((c) => c.id !== campaign.id),
+            ])
           }
         />
         <section>
-          <h2 className="mb-3 text-lg font-medium">Your campaigns</h2>
+          <h2 className="font-display mb-3 text-xl font-bold tracking-tight">
+            Your campaigns
+          </h2>
           <CampaignList campaigns={campaigns} loading={loading} error={error} />
         </section>
       </div>
