@@ -3,8 +3,11 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { getErrorMessage } from "@/lib/errors";
+import { getErrorMessage } from "@/lib/api";
 import { ROUTES } from "@/lib/constants";
+
+const field =
+  "rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500";
 
 export default function LoginForm() {
   const { login } = useAuth();
@@ -17,7 +20,6 @@ export default function LoginForm() {
     event.preventDefault();
     setError(null);
     setSubmitting(true);
-
     try {
       await login({ email: email.trim(), password });
     } catch (err) {
@@ -30,7 +32,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm font-medium text-zinc-800">
+        <label htmlFor="email" className="text-sm font-medium">
           Email
         </label>
         <input
@@ -40,12 +42,12 @@ export default function LoginForm() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+          className={field}
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm font-medium text-zinc-800">
+        <label htmlFor="password" className="text-sm font-medium">
           Password
         </label>
         <input
@@ -56,7 +58,7 @@ export default function LoginForm() {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+          className={field}
         />
       </div>
 
@@ -76,7 +78,7 @@ export default function LoginForm() {
 
       <p className="text-center text-sm text-zinc-600">
         No account?{" "}
-        <Link href={ROUTES.signup} className="font-medium text-zinc-900 underline">
+        <Link href={ROUTES.signup} className="font-medium underline">
           Sign up
         </Link>
       </p>

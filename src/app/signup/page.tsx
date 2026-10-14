@@ -1,11 +1,11 @@
 import Link from "next/link";
-import GuestOnly from "@/components/auth/GuestOnly";
+import AuthGate from "@/components/auth/AuthGate";
 import SignupForm from "@/components/auth/SignupForm";
 import { ROUTES } from "@/lib/constants";
 
 export default function SignupPage() {
   return (
-    <GuestOnly>
+    <AuthGate mode="guest">
       <main className="mx-auto flex min-h-full w-full max-w-md flex-col justify-center px-4 py-12">
         <div className="mb-6">
           <Link href={ROUTES.home} className="text-sm text-zinc-500 hover:text-zinc-800">
@@ -18,6 +18,6 @@ export default function SignupPage() {
         </div>
         <SignupForm />
       </main>
-    </GuestOnly>
+    </AuthGate>
   );
 }

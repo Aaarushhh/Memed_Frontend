@@ -2,12 +2,13 @@
 
 import { useAuth } from "@/context/AuthContext";
 
-interface PageHeaderProps {
+export default function PageHeader({
+  title,
+  subtitle,
+}: {
   title: string;
   subtitle?: string;
-}
-
-export default function PageHeader({ title, subtitle }: PageHeaderProps) {
+}) {
   const { user, logout } = useAuth();
 
   return (
@@ -17,7 +18,7 @@ export default function PageHeader({ title, subtitle }: PageHeaderProps) {
         {subtitle ? <p className="mt-1 text-sm text-zinc-600">{subtitle}</p> : null}
         {user ? (
           <p className="mt-1 text-xs text-zinc-500">
-            Signed in as {user.name} ({user.role})
+            {user.name} · {user.role}
           </p>
         ) : null}
       </div>

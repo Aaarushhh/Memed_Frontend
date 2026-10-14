@@ -4,20 +4,21 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { ROUTES } from "@/lib/constants";
+import { ROUTES, dashboardRoute } from "@/lib/constants";
 
 export default function HomePage() {
   const router = useRouter();
   const { user, isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (isLoading || !isAuthenticated || !user) return;
-    router.replace(user.role === "brand" ? ROUTES.brand : ROUTES.creator);
+    if (!isLoading && isAuthenticated && user) {
+      router.replace(dashboardRoute(user.role));
+    }
   }, [isLoading, isAuthenticated, user, router]);
 
-  if (isLoading) {
+  if (isLoading || isAuthenticated) {
     return (
-      <main className="mx-auto flex min-h-full w-full max-w-lg items-center justify-center px-4 py-16">
+      <main className="mx-auto flex min-h-full items-center justify-center px-4 py-16">
         <p className="text-sm text-zinc-600">Loading…</p>
       </main>
     );

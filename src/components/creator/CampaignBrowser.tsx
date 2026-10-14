@@ -3,7 +3,7 @@
 import { formatInr } from "@/lib/format";
 import type { Campaign } from "@/types";
 
-interface CampaignBrowserProps {
+interface Props {
   campaigns: Campaign[];
   loading?: boolean;
   error?: string | null;
@@ -17,11 +17,8 @@ export default function CampaignBrowser({
   error,
   selectedId,
   onSelect,
-}: CampaignBrowserProps) {
-  if (loading) {
-    return <p className="text-sm text-zinc-600">Loading live campaigns…</p>;
-  }
-
+}: Props) {
+  if (loading) return <p className="text-sm text-zinc-600">Loading campaigns…</p>;
   if (error) {
     return (
       <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
@@ -29,11 +26,8 @@ export default function CampaignBrowser({
       </p>
     );
   }
-
   if (campaigns.length === 0) {
-    return (
-      <p className="text-sm text-zinc-600">No live campaigns available right now.</p>
-    );
+    return <p className="text-sm text-zinc-600">No live campaigns.</p>;
   }
 
   return (
@@ -45,7 +39,7 @@ export default function CampaignBrowser({
             <button
               type="button"
               onClick={() => onSelect(campaign.id)}
-              className={`w-full rounded-lg border p-4 text-left transition-colors ${
+              className={`w-full rounded-lg border p-4 text-left ${
                 selected
                   ? "border-zinc-900 bg-zinc-50"
                   : "border-zinc-200 hover:border-zinc-400"
@@ -60,13 +54,11 @@ export default function CampaignBrowser({
                   Remaining {formatInr(campaign.budgetRemaining)}
                 </p>
               </div>
-
               {campaign.milestones.length > 0 ? (
                 <ul className="mt-2 space-y-0.5 text-sm text-zinc-700">
                   {campaign.milestones.map((m) => (
                     <li key={`${campaign.id}-${m.views}-${m.payout}`}>
-                      {m.views.toLocaleString("en-IN")} views →{" "}
-                      {formatInr(m.payout)}
+                      {m.views.toLocaleString("en-IN")} views → {formatInr(m.payout)}
                     </li>
                   ))}
                 </ul>

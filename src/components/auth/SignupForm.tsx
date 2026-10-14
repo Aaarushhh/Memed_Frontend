@@ -3,9 +3,12 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { getErrorMessage } from "@/lib/errors";
+import { getErrorMessage } from "@/lib/api";
 import { ROUTES } from "@/lib/constants";
 import type { UserRole } from "@/types";
+
+const field =
+  "rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500";
 
 export default function SignupForm() {
   const { signup } = useAuth();
@@ -20,7 +23,6 @@ export default function SignupForm() {
     event.preventDefault();
     setError(null);
     setSubmitting(true);
-
     try {
       await signup({
         name: name.trim(),
@@ -38,7 +40,7 @@ export default function SignupForm() {
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="name" className="text-sm font-medium text-zinc-800">
+        <label htmlFor="name" className="text-sm font-medium">
           Name
         </label>
         <input
@@ -48,12 +50,12 @@ export default function SignupForm() {
           autoComplete="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+          className={field}
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm font-medium text-zinc-800">
+        <label htmlFor="email" className="text-sm font-medium">
           Email
         </label>
         <input
@@ -63,12 +65,12 @@ export default function SignupForm() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+          className={field}
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm font-medium text-zinc-800">
+        <label htmlFor="password" className="text-sm font-medium">
           Password
         </label>
         <input
@@ -79,32 +81,24 @@ export default function SignupForm() {
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+          className={field}
         />
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-zinc-800">Role</legend>
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="radio"
-            name="role"
-            value="brand"
-            checked={role === "brand"}
-            onChange={() => setRole("brand")}
-          />
-          Brand
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="radio"
-            name="role"
-            value="creator"
-            checked={role === "creator"}
-            onChange={() => setRole("creator")}
-          />
-          Creator
-        </label>
+        <legend className="text-sm font-medium">Role</legend>
+        {(["brand", "creator"] as const).map((value) => (
+          <label key={value} className="flex items-center gap-2 text-sm capitalize">
+            <input
+              type="radio"
+              name="role"
+              value={value}
+              checked={role === value}
+              onChange={() => setRole(value)}
+            />
+            {value}
+          </label>
+        ))}
       </fieldset>
 
       {error ? (
@@ -123,7 +117,7 @@ export default function SignupForm() {
 
       <p className="text-center text-sm text-zinc-600">
         Already have an account?{" "}
-        <Link href={ROUTES.login} className="font-medium text-zinc-900 underline">
+        <Link href={ROUTES.login} className="font-medium underline">
           Login
         </Link>
       </p>

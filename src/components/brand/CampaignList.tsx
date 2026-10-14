@@ -3,21 +3,14 @@
 import { formatInr } from "@/lib/format";
 import type { Campaign } from "@/types";
 
-interface CampaignListProps {
+interface Props {
   campaigns: Campaign[];
   loading?: boolean;
   error?: string | null;
 }
 
-export default function CampaignList({
-  campaigns,
-  loading,
-  error,
-}: CampaignListProps) {
-  if (loading) {
-    return <p className="text-sm text-zinc-600">Loading campaigns…</p>;
-  }
-
+export default function CampaignList({ campaigns, loading, error }: Props) {
+  if (loading) return <p className="text-sm text-zinc-600">Loading campaigns…</p>;
   if (error) {
     return (
       <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
@@ -25,13 +18,8 @@ export default function CampaignList({
       </p>
     );
   }
-
   if (campaigns.length === 0) {
-    return (
-      <p className="text-sm text-zinc-600">
-        No campaigns yet. Create one to get started.
-      </p>
-    );
+    return <p className="text-sm text-zinc-600">No campaigns yet.</p>;
   }
 
   return (
@@ -46,55 +34,39 @@ export default function CampaignList({
             : 0;
 
         return (
-          <li
-            key={campaign.id}
-            className="rounded-lg border border-zinc-200 p-4"
-          >
+          <li key={campaign.id} className="rounded-lg border border-zinc-200 p-4">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <h3 className="font-medium">{campaign.name}</h3>
                 <p className="text-sm text-zinc-600">{campaign.platform}</p>
               </div>
               <p className="text-sm text-zinc-600">
-                Budget {formatInr(campaign.totalBudget)}
+                {formatInr(campaign.totalBudget)}
               </p>
             </div>
 
             <div className="mt-3 grid gap-1 text-sm sm:grid-cols-2">
               <p>
-                Spent:{" "}
-                <span className="font-medium">{formatInr(campaign.budgetSpent)}</span>
+                Spent: <span className="font-medium">{formatInr(campaign.budgetSpent)}</span>
               </p>
               <p>
                 Remaining:{" "}
-                <span className="font-medium">
-                  {formatInr(campaign.budgetRemaining)}
-                </span>
+                <span className="font-medium">{formatInr(campaign.budgetRemaining)}</span>
               </p>
             </div>
 
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-100">
-              <div
-                className="h-full bg-zinc-900"
-                style={{ width: `${spentPct}%` }}
-              />
+              <div className="h-full bg-zinc-900" style={{ width: `${spentPct}%` }} />
             </div>
-            <p className="mt-1 text-xs text-zinc-500">{spentPct}% spent</p>
 
             {campaign.milestones.length > 0 ? (
-              <div className="mt-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-                  Milestones
-                </p>
-                <ul className="mt-1 space-y-0.5 text-sm text-zinc-700">
-                  {campaign.milestones.map((m) => (
-                    <li key={`${campaign.id}-${m.views}-${m.payout}`}>
-                      {m.views.toLocaleString("en-IN")} views →{" "}
-                      {formatInr(m.payout)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="mt-3 space-y-0.5 text-sm text-zinc-700">
+                {campaign.milestones.map((m) => (
+                  <li key={`${campaign.id}-${m.views}-${m.payout}`}>
+                    {m.views.toLocaleString("en-IN")} views → {formatInr(m.payout)}
+                  </li>
+                ))}
+              </ul>
             ) : null}
           </li>
         );

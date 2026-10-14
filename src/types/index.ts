@@ -1,5 +1,4 @@
 export type UserRole = "brand" | "creator";
-
 export type Platform = "Instagram" | "YouTube";
 
 export interface User {
@@ -9,7 +8,6 @@ export interface User {
   role: UserRole;
 }
 
-/** Matches backend milestone shape: `{ views, payout }` */
 export interface Milestone {
   views: number;
   payout: number;
@@ -23,14 +21,14 @@ export interface Campaign {
   budgetSpent: number;
   budgetRemaining: number;
   milestones: Milestone[];
-  brandId: string;
+  brandId?: string;
   createdAt?: string;
 }
 
 export interface Submission {
   id: string;
   campaignId: string;
-  creatorId: string;
+  creatorId?: string;
   postUrl: string;
   views: number;
   payout: number;
@@ -68,7 +66,6 @@ export interface SubmitPostPayload {
 
 export interface CreatorEarnings {
   totalEarnings: number;
-  submissions: Submission[];
 }
 
 export interface ApiError {

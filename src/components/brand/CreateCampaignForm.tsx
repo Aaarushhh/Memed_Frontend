@@ -1,44 +1,33 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { getErrorMessage } from "@/lib/errors";
+import { getErrorMessage } from "@/lib/api";
 import { PLATFORMS } from "@/lib/constants";
 import { createCampaign } from "@/lib/services/campaigns";
 import type { Campaign, Milestone, Platform } from "@/types";
 
-interface CreateCampaignFormProps {
+const field =
+  "rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500";
+
+interface Props {
   onCreated: (campaign: Campaign) => void;
 }
 
-const emptyMilestone = (): Milestone => ({ views: 0, payout: 0 });
-
-export default function CreateCampaignForm({ onCreated }: CreateCampaignFormProps) {
+export default function CreateCampaignForm({ onCreated }: Props) {
   const [name, setName] = useState("");
   const [platform, setPlatform] = useState<Platform>("Instagram");
   const [totalBudget, setTotalBudget] = useState("");
-  const [milestones, setMilestones] = useState<Milestone[]>([emptyMilestone()]);
+  const [milestones, setMilestones] = useState<Milestone[]>([
+    { views: 0, payout: 0 },
+  ]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  function updateMilestone(
-    index: number,
-    field: keyof Milestone,
-    value: string
-  ) {
+  function updateMilestone(index: number, key: keyof Milestone, value: string) {
     setMilestones((prev) =>
       prev.map((item, i) =>
-        i === index ? { ...item, [field]: Number(value) || 0 } : item
+        i === index ? { ...item, [key]: Number(value) || 0 } : item
       )
-    );
-  }
-
-  function addMilestone() {
-    setMilestones((prev) => [...prev, emptyMilestone()]);
-  }
-
-  function removeMilestone(index: number) {
-    setMilestones((prev) =>
-      prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)
     );
   }
 
@@ -47,21 +36,12 @@ export default function CreateCampaignForm({ onCreated }: CreateCampaignFormProp
     setError(null);
 
     const budget = Number(totalBudget);
-    if (!name.trim() || !Number.isFinite(budget) || budget <= 0) {
-      setError("Enter a valid name and total budget");
-      return;
-    }
-
     const cleaned = milestones
-      .map((m) => ({
-        views: Number(m.views),
-        payout: Number(m.payout),
-      }))
       .filter((m) => m.views > 0 && m.payout > 0)
       .sort((a, b) => a.views - b.views);
 
-    if (cleaned.length === 0) {
-      setError("Add at least one milestone with views and payout");
+    if (!name.trim() || !(budget > 0) || cleaned.length === 0) {
+      setError("Name, budget, and at least one milestone are required");
       return;
     }
 
@@ -77,7 +57,7 @@ export default function CreateCampaignForm({ onCreated }: CreateCampaignFormProp
       setName("");
       setTotalBudget("");
       setPlatform("Instagram");
-      setMilestones([emptyMilestone()]);
+      setMilestones([{ views: 0, payout: 0 }]);
     } catch (err) {
       setError(getErrorMessage(err, "Failed to create campaign"));
     } finally {
@@ -92,20 +72,20 @@ export default function CreateCampaignForm({ onCreated }: CreateCampaignFormProp
     >
       <h2 className="text-lg font-medium">Create campaign</h2>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label htmlFor="campaign-name" className="text-sm font-medium">
-            Name
-          </label>
-          <input
-            id="campaign-name"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
-          />
-        </div>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="campaign-name" className="text-sm font-medium">
+          Name
+        </label>
+        <input
+          id="campaign-name"
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={field}
+        />
+      </div>
 
+      <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="platform" className="text-sm font-medium">
             Platform
@@ -114,7 +94,7 @@ export default function CreateCampaignForm({ onCreated }: CreateCampaignFormProp
             id="platform"
             value={platform}
             onChange={(e) => setPlatform(e.target.value as Platform)}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+            className={field}
           >
             {PLATFORMS.map((item) => (
               <option key={item} value={item}>
@@ -135,20 +115,22 @@ export default function CreateCampaignForm({ onCreated }: CreateCampaignFormProp
             required
             value={totalBudget}
             onChange={(e) => setTotalBudget(e.target.value)}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
+            className={field}
           />
         </div>
       </div>
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">Milestone ladder</h3>
+          <h3 className="text-sm font-medium">Milestones</h3>
           <button
             type="button"
-            onClick={addMilestone}
-            className="text-sm font-medium text-zinc-900 underline"
+            onClick={() =>
+              setMilestones((prev) => [...prev, { views: 0, payout: 0 }])
+            }
+            className="text-sm underline"
           >
-            Add milestone
+            Add
           </button>
         </div>
 
@@ -160,8 +142,7 @@ export default function CreateCampaignForm({ onCreated }: CreateCampaignFormProp
               placeholder="Views"
               value={milestone.views || ""}
               onChange={(e) => updateMilestone(index, "views", e.target.value)}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
-              aria-label={`Milestone ${index + 1} views`}
+              className={field}
             />
             <input
               type="number"
@@ -169,14 +150,16 @@ export default function CreateCampaignForm({ onCreated }: CreateCampaignFormProp
               placeholder="Payout ₹"
               value={milestone.payout || ""}
               onChange={(e) => updateMilestone(index, "payout", e.target.value)}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500"
-              aria-label={`Milestone ${index + 1} payout`}
+              className={field}
             />
             <button
               type="button"
-              onClick={() => removeMilestone(index)}
+              onClick={() =>
+                setMilestones((prev) =>
+                  prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)
+                )
+              }
               className="rounded-md border border-zinc-300 px-3 text-sm"
-              aria-label={`Remove milestone ${index + 1}`}
             >
               ×
             </button>

@@ -87,32 +87,31 @@ Expected backend envelopes (from API collection):
 
 ```
 src/
-├── app/                 # Routes (login, signup, brand, creator)
+├── app/              # /, /login, /signup, /brand, /creator
 ├── components/
-│   ├── auth/            # Forms + route guards
-│   ├── brand/           # Campaign create + list
-│   ├── creator/         # Browse, submit, earnings
-│   ├── providers/       # App providers
+│   ├── auth/         # Login, Signup, AuthGate
+│   ├── brand/        # Create + list campaigns
+│   ├── creator/      # Browse, submit, earnings
+│   ├── providers/
 │   └── ui/
-├── context/             # AuthContext
+├── context/          # Auth session
 ├── lib/
-│   ├── api.ts           # Fetch wrapper
-│   ├── constants.ts     # Routes + ENDPOINTS
-│   ├── normalize.ts     # Response adapters
-│   └── services/        # Auth, campaigns, submissions
+│   ├── api.ts        # Fetch + unwrap `{ data }` / `{ error }`
+│   ├── map.ts        # Map API payloads → typed models
+│   ├── constants.ts  # ROUTES + ENDPOINTS
+│   └── services/     # One function per endpoint used by UI
 └── types/
 ```
 
 ## Assumptions
 
-1. **API base URL** includes `/api` (Postman `baseUrl` style: `http://localhost:3000/api`).
-2. **Milestones** use `{ views, payout }` (not `viewThreshold`).
-3. **Auth response** lives under `data`: `{ data: { token, user } }`. Mongo-style `_id` is normalized to `id`.
-4. **Brand campaign list** is `GET /campaigns` (authenticated brand). **Creator live list** is `GET /campaigns/live`.
-5. **Earnings** endpoint returns at least `{ totalEarnings }`. If it does not include submissions, the UI still shows total earnings and keeps any locally known submissions after submit.
-6. **Payout / budget cap logic** lives on the backend. Updating views is done via `PATCH /submissions/:id/views` (e.g. Postman); the frontend exposes a service helper for it.
-7. **Role dashboards** are separated: wrong role is redirected to the correct dashboard.
-8. Styling is intentionally minimal — focus is functionality and structure.
+1. API base URL includes `/api` (`http://localhost:3000/api`).
+2. Success envelope is `{ data, message }`; errors are `{ success: false, error }`.
+3. Milestones use `{ views, payout }`.
+4. Brand list/create: `GET/POST /campaigns`. Creator live list: `GET /campaigns/live`.
+5. Earnings is `GET /submissions/earnings` → `{ totalEarnings }`.
+6. Payout/budget logic and view updates stay on the backend (`PATCH /submissions/:id/views` via Postman).
+7. Frontend only calls APIs needed for the current screen (no redundant refetches after submit).
 
 ## Suggested manual test flow
 

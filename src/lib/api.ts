@@ -7,6 +7,7 @@ type RequestOptions = Omit<RequestInit, "body"> & {
   auth?: boolean;
 };
 
+/** Success: `{ data, message }` → returns `data`. Error: `{ error }`. */
 async function request<T>(
   path: string,
   { body, auth = true, headers, ...rest }: RequestOptions = {}
@@ -23,35 +24,27 @@ async function request<T>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
+  let json: unknown = null;
+  try {
+    json = await response.json();
+  } catch {
+    json = null;
+  }
+
   if (!response.ok) {
-    let message = "Something went wrong";
-    try {
-      const data = (await response.json()) as {
-        message?: string;
-        error?: string;
-        errors?: Array<string | { message?: string }>;
-      };
-      // Backend error shape: `{ success: false, error }`
-      if (typeof data.error === "string" && data.error.trim()) {
-        message = data.error;
-      } else if (data.message) {
-        message = data.message;
-      } else if (Array.isArray(data.errors) && data.errors.length > 0) {
-        const first = data.errors[0];
-        message = typeof first === "string" ? first : first.message ?? message;
-      }
-    } catch {
-      // ignore non-JSON error bodies
-    }
-    const error: ApiError = { message, status: response.status };
+    const errBody = json as { error?: string } | null;
+    const error: ApiError = {
+      message: errBody?.error || "Something went wrong",
+      status: response.status,
+    };
     throw error;
   }
 
-  if (response.status === 204) {
-    return undefined as T;
+  if (json && typeof json === "object" && "data" in json) {
+    return (json as { data: T }).data;
   }
 
-  return (await response.json()) as T;
+  return json as T;
 }
 
 export const api = {
@@ -63,7 +56,13 @@ export const api = {
 
   patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>
     request<T>(path, { ...options, method: "PATCH", body }),
-
-  delete: <T>(path: string, options?: RequestOptions) =>
-    request<T>(path, { ...options, method: "DELETE" }),
 };
+
+export function getErrorMessage(error: unknown, fallback = "Something went wrong") {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as ApiError).message;
+    if (typeof message === "string" && message.trim()) return message;
+  }
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}

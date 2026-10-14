@@ -1,33 +1,18 @@
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/constants";
-import {
-  normalizeCreatorEarnings,
-  normalizeSubmission,
-} from "@/lib/normalize";
+import { mapEarnings, mapSubmission } from "@/lib/map";
 import type { CreatorEarnings, Submission, SubmitPostPayload } from "@/types";
 
 export async function submitPost(
   payload: SubmitPostPayload
 ): Promise<Submission> {
-  const raw = await api.post(ENDPOINTS.submissions.create, payload);
-  return normalizeSubmission(raw);
+  const data = await api.post<{
+    submission: Parameters<typeof mapSubmission>[0];
+  }>(ENDPOINTS.submissions.create, payload);
+  return mapSubmission(data.submission);
 }
 
-/** Creator: GET /submissions/earnings → `{ totalEarnings }` */
 export async function getMyEarnings(): Promise<CreatorEarnings> {
-  const raw = await api.get(ENDPOINTS.submissions.earnings);
-  return normalizeCreatorEarnings(raw);
-}
-
-/** No auth — simulates platform view updates */
-export async function updateSubmissionViews(
-  submissionId: string,
-  views: number
-): Promise<Submission> {
-  const raw = await api.patch(
-    ENDPOINTS.submissions.updateViews(submissionId),
-    { views },
-    { auth: false }
-  );
-  return normalizeSubmission(raw);
+  const data = await api.get(ENDPOINTS.submissions.earnings);
+  return mapEarnings(data as { totalEarnings?: number });
 }
